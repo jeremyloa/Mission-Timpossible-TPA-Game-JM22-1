@@ -11,10 +11,13 @@ public class MainCharScript : MonoBehaviour
     [SerializeField] float gravity = -9.8f;
     Vector3 posSphere;
     Vector3 velocity;
+    private Animator anim;
+    float xDir, zDir;
     // Start is called before the first frame update
     void Start()
     {
         cont = GetComponent<CharacterController>();
+        anim = GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -22,15 +25,16 @@ public class MainCharScript : MonoBehaviour
     {
         MovetoDirection();
         Gravity();
+        GetPos(xDir, zDir);
     }
 
     void MovetoDirection ()
     {
-        float xDir = Input.GetAxis("Horizontal");
-        float zDir = Input.GetAxis("Vertical");
+        xDir = Input.GetAxis("Horizontal");
+        zDir = Input.GetAxis("Vertical");
 
-        Vector3 moveDir = new Vector3(xDir, 0.0f, zDir);
-        transform.position += moveDir;
+        // Vector3 moveDir = new Vector3(xDir, 0.0f, zDir);
+        // transform.position += moveDir;
     }
 
     bool IsGrounded()
@@ -51,5 +55,11 @@ public class MainCharScript : MonoBehaviour
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(posSphere, cont.radius-0.05f);
+    }
+
+    void GetPos(float xDir, float zDir)
+    {
+        anim.SetFloat("Pos X", xDir);
+        anim.SetFloat("Pos Y", zDir);
     }
 }

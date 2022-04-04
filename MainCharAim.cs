@@ -6,18 +6,26 @@ public class MainCharAim : MonoBehaviour
 {
     public Cinemachine.AxisState xAxis, yAxis;
     [SerializeField] Transform followPos;
+    [SerializeField] public Transform aimPos;
+    [SerializeField] float aimSmoothSpeed = 20;
+    [SerializeField] LayerMask aimMask;
 
     // Start is called before the first frame update
     void Start()
-    {
-        
-    }
+    {}
 
     // Update is called once per frame
     void Update()
     {
         xAxis.Update(Time.deltaTime);
         yAxis.Update(Time.deltaTime);
+        Vector2 screenCentre = new Vector2(Screen.width / 2, Screen.height / 2);
+        Ray ray = Camera.main.ScreenPointToRay(screenCentre);
+        if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, aimMask))
+        {
+            Debug.Log(hit.transform.name);
+            aimPos.position = Vector3.Lerp(aimPos.position, hit.point, aimSmoothSpeed * Time.deltaTime);
+        }
     }
 
     private void LateUpdate()

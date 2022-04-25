@@ -17,8 +17,8 @@ public class MissionSystem : MonoBehaviour
     PistolAmmo pistolAmmo;
     SniperAmmo sniperAmmo;
     SniperEquip sniperEquip;
-    [SerializeField] GameObject TunnelDoorLeft, TunnelDoorRight;
-    bool RotateTunnelDoor;
+    [SerializeField] GameObject TunnelDoorLeft, TunnelDoorRight, TrainingAreaWalls, TeleDoorLeft, TeleDoorRight, VillageAreaWalls;
+    bool RotateTunnelDoor, RotateTeleDoor;
     // Start is called before the first frame update
     void Start()
     {
@@ -29,7 +29,7 @@ public class MissionSystem : MonoBehaviour
         sniperAmmo = GetComponent<SniperAmmo>();
         BotLeftDialog.SetActive(false);
         BotCentInteract.SetActive(false);
-        RotateTunnelDoor = false;
+        RotateTunnelDoor = RotateTeleDoor = false;
     }
 
     void Update()
@@ -42,13 +42,25 @@ public class MissionSystem : MonoBehaviour
 
         if (RotateTunnelDoor == true)
         {
-            if (TunnelDoorLeft.transform.rotation.eulerAngles.y>180)
-            TunnelDoorLeft.transform.Rotate
-                (new Vector3(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y - (Time.deltaTime * 2), transform.rotation.eulerAngles.z));
-            if (TunnelDoorRight.transform.rotation.eulerAngles.y < 360)
-                TunnelDoorRight.transform.Rotate
-                    (new Vector3(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y + (Time.deltaTime * 2), transform.rotation.eulerAngles.z));
-            if (TunnelDoorLeft.transform.rotation.eulerAngles.y == 180 && TunnelDoorRight.transform.rotation.eulerAngles.y == 360) RotateTunnelDoor = false;
+            TrainingAreaWalls.SetActive(false);
+            TunnelDoorLeft.SetActive(false);
+            TunnelDoorRight.SetActive(false);
+            RotateTunnelDoor = false;
+            //if (TunnelDoorLeft.transform.rotation.eulerAngles.y>180)
+            //TunnelDoorLeft.transform.Rotate
+            //    (new Vector3(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y - (Time.deltaTime * 2), transform.rotation.eulerAngles.z));
+            //if (TunnelDoorRight.transform.rotation.eulerAngles.y < 360)
+            //    TunnelDoorRight.transform.Rotate
+            //        (new Vector3(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y + (Time.deltaTime * 2), transform.rotation.eulerAngles.z));
+            //if (TunnelDoorLeft.transform.rotation.eulerAngles.y == 180 && TunnelDoorRight.transform.rotation.eulerAngles.y == 360) RotateTunnelDoor = false;
+        }
+
+        if (RotateTeleDoor == true)
+        {
+            VillageAreaWalls.SetActive(false);
+            TeleDoorLeft.SetActive(false);
+            TeleDoorRight.SetActive(false);
+            RotateTeleDoor = false;
         }
     }
 
@@ -64,7 +76,7 @@ public class MissionSystem : MonoBehaviour
         }
 
         //pickup pistol ammo
-        if (Physics.Raycast(ray, out hit, Mathf.Infinity, pistolAmmoMask))
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity, pistolAmmoMask) || Physics.CheckSphere(transform.position, 10, pistolAmmoMask))
         {
             BotCentInteractText.SetText("Press F to pick up PISTOL AMMO.");
             BotCentInteract.SetActive(true);
@@ -77,7 +89,7 @@ public class MissionSystem : MonoBehaviour
         }
 
         //pickup rifle ammo
-        if (Physics.Raycast(ray, out hit, Mathf.Infinity, sniperAmmoMask))
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity, sniperAmmoMask) || Physics.CheckSphere(transform.position, 10, sniperAmmoMask))
         {
             BotCentInteractText.SetText("Press F to pick up RIFLE AMMO.");
             BotCentInteract.SetActive(true);
@@ -90,7 +102,7 @@ public class MissionSystem : MonoBehaviour
         }
 
         //pickup pistol
-        if (Physics.Raycast(ray, out hit, 10, pistolMask) || aim.hit.transform.name.Equals("PistolTAKE"))
+        if ((Physics.Raycast(ray, out hit, 10, pistolMask) || aim.hit.transform.name.Equals("PistolTAKE")) && MainCharScript.missionTwo == 0)
         {
             BotCentInteractText.SetText("Press F to pick up PISTOL.");
             BotCentInteract.SetActive(true);
@@ -102,7 +114,7 @@ public class MissionSystem : MonoBehaviour
         }
 
         //pickup rifle
-        if ((Physics.Raycast(ray, out hit, 10, sniperMask) || aim.hit.transform.name.Equals("SniperTAKE")) && MainChar.pistolAvail == true)
+        if ((Physics.Raycast(ray, out hit, 10, sniperMask) || aim.hit.transform.name.Equals("SniperTAKE")) && MainChar.pistolAvail == true && MainCharScript.missionFour == 0)
         {
             BotCentInteractText.SetText("Press F to pick up RIFLE.");
             BotCentInteract.SetActive(true);
@@ -135,6 +147,8 @@ public class MissionSystem : MonoBehaviour
         else if (MainCharScript.missionOne == 0 && MainChar.checkNearAsuna == true && Input.GetKeyDown(KeyCode.F))
         {
             MainCharScript.missionOne = 1;
+            pistolAmmo.extraAmmo = pistolAmmo.extraAmmo + pistolAmmo.baseAmmo;
+            sniperAmmo.extraAmmo = sniperAmmo.extraAmmo + sniperAmmo.baseAmmo;
             //Time.timeScale = 0;
             //BotLeftDialogText.SetText("You haven't finish your mission.");
             //BotLeftDialog.SetActive(true);
@@ -159,6 +173,8 @@ public class MissionSystem : MonoBehaviour
             Time.timeScale = 0;
             BotLeftDialogText.SetText("Come back when you have mastered the art of shooting.");
             BotLeftDialog.SetActive(true);
+            pistolAmmo.extraAmmo = pistolAmmo.extraAmmo + pistolAmmo.baseAmmo;
+            sniperAmmo.extraAmmo = sniperAmmo.extraAmmo + sniperAmmo.baseAmmo;
             MainCharScript.missionThree = 0;
         }
         else if (MainCharScript.missionThree == 0 && MainChar.checkNearAsuna == true && Input.GetKeyDown(KeyCode.F))
@@ -173,6 +189,8 @@ public class MissionSystem : MonoBehaviour
             Time.timeScale = 0;
             BotLeftDialogText.SetText("Good. Now, shoot 50 bullets using the rifle.");
             BotLeftDialog.SetActive(true);
+            pistolAmmo.extraAmmo = pistolAmmo.extraAmmo + pistolAmmo.baseAmmo;
+            sniperAmmo.extraAmmo = sniperAmmo.extraAmmo + sniperAmmo.baseAmmo;
             MainCharScript.missionFour = 0;
         }
         else if (MainCharScript.missionFour == 0 && MainChar.checkNearAsuna == true && Input.GetKeyDown(KeyCode.F))
@@ -188,6 +206,9 @@ public class MissionSystem : MonoBehaviour
             BotLeftDialogText.SetText("Seems like you're ready for war. Now go through the passage and eliminate the enemies!");
             BotLeftDialog.SetActive(true);
             RotateTunnelDoor = true;
+            //RotateTeleDoor = true;
+            pistolAmmo.extraAmmo = pistolAmmo.extraAmmo + pistolAmmo.baseAmmo;
+            sniperAmmo.extraAmmo = sniperAmmo.extraAmmo + sniperAmmo.baseAmmo;
             MainCharScript.missionFive = 0;
         }
         else if (MainCharScript.missionFive == 0 && MainChar.checkNearAsuna == true && Input.GetKeyDown(KeyCode.F))
@@ -202,7 +223,10 @@ public class MissionSystem : MonoBehaviour
             Time.timeScale = 0;
             BotLeftDialogText.SetText("Great job! Now we only need to eliminate the boss!");
             BotLeftDialog.SetActive(true);
-            //rotate teleport door
+            RotateTeleDoor = true;
+            pistolAmmo.extraAmmo = pistolAmmo.extraAmmo + pistolAmmo.baseAmmo;
+            sniperAmmo.extraAmmo = sniperAmmo.extraAmmo + sniperAmmo.baseAmmo;
+            MainCharScript.currHealth = MainCharScript.maxHealth;
             MainCharScript.missionSix = 0;
         }
         else if (MainCharScript.missionSix == 0 && MainChar.checkNearAsuna == true && Input.GetKeyDown(KeyCode.F))

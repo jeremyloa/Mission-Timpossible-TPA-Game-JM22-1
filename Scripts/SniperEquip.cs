@@ -98,5 +98,14 @@ public class SniperEquip : MonoBehaviour
                 animate = false; MainChar.sniperOn = true; firstTime = false; takeSniper = false;
             }
         }
+
+        //if (MainChar.pistolOn == true)
+        //{
+        //    pistol.Pistol.SetActive(true); Sniper.SetActive(false); MainChar.sniperOn = false;
+        //}
+        //else if (MainChar.sniperOn == true)
+        //{
+        //    Sniper.SetActive(true); pistol.Pistol.SetActive(false); MainChar.pistolOn = false;
+        //}
     }
 }

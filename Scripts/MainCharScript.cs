@@ -6,8 +6,8 @@ public class MainCharScript : MonoBehaviour
 {
     public static int missionOne, missionTwo, missionThree, missionFour, missionFive, missionSix;
     public static int missionThreeScore, missionFourScore, missionFiveScore;
-    public int maxHealth = 100;
-    public int currHealth;
+    public static int maxHealth = 100;
+    public static int currHealth;
     public HealthBarScript healthBar;
     public bool pistolAvail, sniperAvail, pistolOn, sniperOn, checkNearAsuna;
     CharacterController cont;
@@ -22,9 +22,19 @@ public class MainCharScript : MonoBehaviour
     private Animator anim;
     float xDir, zDir;
     MainCharAim aim;
+    [SerializeField] CanvasGroup SniperIcon, PistolIcon;
+    [SerializeField] TMPro.TMP_Text AmmoCount;
+    PistolAmmo pistolAmmo;
+    SniperAmmo sniperAmmo;
+    float walkRate, walkRateTimer;
+    [SerializeField] AudioClip walkSFX;
+    AudioSource src;
+    [SerializeField] int speedUp;
+    int display;
     // Start is called before the first frame update
     void Start()
     {
+        src = GetComponent<AudioSource>();
         trainingWalls.SetActive(true); villageWalls.SetActive(true);
         pistolAvail = sniperAvail = pistolOn = sniperOn = checkNearAsuna = false;
         missionOne = missionTwo = missionThree = missionFour = missionFive = missionSix = -1;
@@ -33,15 +43,40 @@ public class MainCharScript : MonoBehaviour
         cont = GetComponent<CharacterController>();
         anim = GetComponent<Animator>();
         aim = GetComponent<MainCharAim>();
+        pistolAmmo = GetComponent<PistolAmmo>();
+        sniperAmmo = GetComponent<SniperAmmo>();
         healthBar.SetMax(maxHealth);
-
+        AmmoCount.SetText("0/0");
+        walkRateTimer = walkRate = 0.5f;
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (pistolOn == true)
+        {
+            display = pistolAmmo.baseAmmo + pistolAmmo.extraAmmo;
+            AmmoCount.SetText(pistolAmmo.currentAmmo + "/" + display);
+            PistolIcon.alpha = 1;
+        } 
+        else
+        {
+            PistolIcon.alpha = 0.5f;
+        }
+
+        if (sniperOn == true)
+        {
+            display = sniperAmmo.baseAmmo + sniperAmmo.extraAmmo;
+            AmmoCount.SetText(sniperAmmo.currentAmmo + "/" + display);
+            SniperIcon.alpha = 1;
+        }
+        else
+        {
+            SniperIcon.alpha = 0.5f;
+        }
+        walkRateTimer = walkRateTimer + Time.deltaTime;
         MovetoDirection();
-        Gravity();
+        //Gravity();
         GetPos(xDir, zDir);
         if (Physics.CheckSphere(transform.position, 1, asunaMask) == true || aim.transform.name.Equals("SphereAsuna")) checkNearAsuna = true;
         else checkNearAsuna = false;
@@ -51,8 +86,50 @@ public class MainCharScript : MonoBehaviour
 
     void MovetoDirection ()
     {
+        Vector3 prevLoc = transform.eulerAngles;
         xDir = Input.GetAxis("Horizontal");
         zDir = Input.GetAxis("Vertical");
+        //Debug.Log("xDir before = " + prevLoc.x);
+        //Debug.Log("xDir curr = " + xDir);
+        //Debug.Log("zDir before = " + prevLoc.z);
+        //Debug.Log("zDir curr = " + zDir);
+        Vector3 newLoc = new Vector3(xDir, transform.eulerAngles.y, zDir);
+        if (prevLoc!=newLoc)
+        {
+        //Debug.Log(prevLoc + "and " + newLoc);
+            if (walkRateTimer >= walkRate)
+            {
+                //Debug.Log(walkRateTimer + "dan " + walkRate);
+                walkRateTimer = 0;
+                src.PlayOneShot(walkSFX);
+                //Debug.Log("NEW" + walkRateTimer + "dan " + walkRate);
+            }
+        }
+
+        if (pistolOn == false && sniperOn == false)
+        {
+            //Debug.Log("No weapon used");
+            if (prevLoc.x != newLoc.x)
+            {
+                //Debug.Log("xDir before = " + prevLoc.x);
+                //Debug.Log("xDir curr = " + xDir);
+                float deltaX = newLoc.x - prevLoc.x;
+                xDir = prevLoc.x + (deltaX * speedUp);
+                //Debug.Log("xDir after = " + xDir);
+                Debug.Log("Speed up xDir");
+            }
+
+            if (prevLoc.z != newLoc.z)
+            {
+                //Debug.Log("zDir before = " + prevLoc.z);
+                //Debug.Log("zDir curr = " + zDir);
+                float deltaZ = zDir - prevLoc.z;
+                zDir = prevLoc.z + (deltaZ * speedUp);
+                //Debug.Log("zDir after = " + zDir);
+                Debug.Log("Speed up zDir");
+            }
+
+        }
 
         // Vector3 moveDir = new Vector3(xDir, 0.0f, zDir);
         // transform.position += moveDir;

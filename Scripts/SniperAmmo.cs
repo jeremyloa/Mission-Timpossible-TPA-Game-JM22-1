@@ -25,7 +25,7 @@ public class SniperAmmo : MonoBehaviour
         //    AmmoSniper = hit.transform.gameObject;
         //    AmmoSniper.SetActive(false);
         //}
-        if (currentAmmo == 0) Reload();
+        if (currentAmmo == 0) Reload();        
     }
 
     public void Reload() {

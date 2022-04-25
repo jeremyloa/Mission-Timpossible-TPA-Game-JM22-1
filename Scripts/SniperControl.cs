@@ -1,34 +1,38 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+using UnityEngine; 
 
-public class SniperControl : MonoBehaviour
+public class SniperControl : WeaponControl
 {
+    //public static bool recoil;
+    //[SerializeField] float shootRate;
+    //[SerializeField] bool autoShoot;
+    //float shootRateTimer;
+    //public int damage, speed, drop;
+    //[SerializeField] GameObject bullet;
+    //[SerializeField] Transform bulletPos;
+    //[SerializeField] float bulletVelo;
+    //[SerializeField] int bulletsPerShot;
+    //MainCharAim aim;
+    //MainCharScript MainChar;
+    //[SerializeField] AudioClip shotSFX;
+    //AudioSource src;
 
-    [SerializeField] float shootRate;
-    [SerializeField] bool autoShoot;
-    float shootRateTimer;
-    float tempShootRate;
-    public int damage, speed, drop;
-    [SerializeField] GameObject bullet;
-    [SerializeField] Transform bulletPos;
-    [SerializeField] float bulletVelo;
-    [SerializeField] int bulletsPerShot;
-    MainCharAim aim;
-    MainCharScript MainChar;
-    [SerializeField] AudioClip shotSFX;
-    AudioSource src;
-
+    //NEW
     SniperAmmo ammo;
     // Start is called before the first frame update
     void Start()
     {
-        MainChar = GetComponent<MainCharScript>();
-        damage = 35; speed = 500; drop = 50;
-        src = GetComponent<AudioSource>();
-        aim = GetComponentInParent<MainCharAim>();
+        base.Start();
+        //recoil = false;
+        //MainChar = GetComponent<MainCharScript>();
+        //damage = 35; speed = 500; drop = 50;
+        //src = GetComponent<AudioSource>();
+        //aim = GetComponentInParent<MainCharAim>();
+        //shootRateTimer = shootRate;
+
+        //NEW
         ammo = GetComponent<SniperAmmo>();
-        shootRateTimer = shootRate;
     }
 
 
@@ -40,7 +44,7 @@ public class SniperControl : MonoBehaviour
     }
 
     bool CheckShoot()
-    {
+    { 
         if (MainChar.sniperOn == false) return false;
         shootRateTimer = shootRateTimer + Time.deltaTime;
         if (shootRateTimer < shootRate) return false;
@@ -50,20 +54,24 @@ public class SniperControl : MonoBehaviour
         return false;
     }
 
-    public void Shoot()
+    public override void Shoot()
     {
-        shootRateTimer = 0;
-        // Debug.Log("Shoot");
-        bulletPos.LookAt(aim.aimPos);
+        base.Shoot();
+        //shootRateTimer = 0;
+        //// Debug.Log("Shoot");
+        //bulletPos.LookAt(aim.aimPos);
         
-        for (int i = 0; i < bulletsPerShot; i++)
-        {
-            GameObject currBullet = Instantiate(bullet, bulletPos.position, bulletPos.rotation);
-            Rigidbody rigid = currBullet.GetComponent<Rigidbody>();
-            rigid.AddForce(bulletPos.forward * bulletVelo, ForceMode.Impulse);
-        }
-        MainCharScript.missionFourScore = MainCharScript.missionFourScore + 1;
-        src.PlayOneShot(shotSFX);
+        //for (int i = 0; i < bulletsPerShot; i++)
+        //{
+        //    GameObject currBullet = Instantiate(bullet, bulletPos.position, bulletPos.rotation);
+        //    Rigidbody rigid = currBullet.GetComponent<Rigidbody>();
+        //    rigid.AddForce(bulletPos.forward * bulletVelo, ForceMode.Impulse);
+        //}
+        //src.PlayOneShot(shotSFX);
+        //recoil = true;
+
+        //NEW
         ammo.currentAmmo--;
+        MainCharScript.missionFourScore = MainCharScript.missionFourScore + 1;
     }
 }

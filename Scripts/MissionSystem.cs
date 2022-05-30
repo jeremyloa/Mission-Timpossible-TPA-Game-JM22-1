@@ -12,13 +12,14 @@ public class MissionSystem : MonoBehaviour
     [SerializeField] TMPro.TMP_Text TopLeftMissionText;
     MainCharScript MainChar;
     MainCharAim aim;
-    [SerializeField] LayerMask pistolMask, pistolAmmoMask, sniperMask, sniperAmmoMask;
+    [SerializeField] LayerMask pistolMask, pistolAmmoMask, sniperMask, sniperAmmoMask, TeleportMask;
     Ray ray; RaycastHit hit;
     PistolAmmo pistolAmmo;
     SniperAmmo sniperAmmo;
     SniperEquip sniperEquip;
-    [SerializeField] GameObject TunnelDoorLeft, TunnelDoorRight, TrainingAreaWalls, TeleDoorLeft, TeleDoorRight, VillageAreaWalls;
+    [SerializeField] GameObject TunnelDoorLeft, TunnelDoorRight, TrainingAreaWalls, TeleDoorLeft, TeleDoorRight, VillageAreaWalls, SphereTeleport;
     bool RotateTunnelDoor, RotateTeleDoor;
+    [SerializeField] TeleportScript teleport;
     // Start is called before the first frame update
     void Start()
     {
@@ -128,7 +129,20 @@ public class MissionSystem : MonoBehaviour
             return;
         }
 
-        
+        //teleport
+        if ((Physics.CheckSphere(transform.position, 5, TeleportMask) || aim.hit.transform.name.Equals("CubeTeleport")) && TeleportScript.ReadyTeleport == true)
+        {
+            BotCentInteractText.SetText("Press F to teleport.");
+            BotCentInteract.SetActive(true);
+            if (Input.GetKeyDown(KeyCode.F))
+            {
+                MainCharScript.currHealth = MainCharScript.maxHealth;
+                MainChar.healthSystem();
+                teleport.goTeleport();
+            }
+            return;
+        }
+
         BotCentInteract.SetActive(false);
         return;
     }
@@ -227,6 +241,7 @@ public class MissionSystem : MonoBehaviour
             pistolAmmo.extraAmmo = pistolAmmo.extraAmmo + pistolAmmo.baseAmmo;
             sniperAmmo.extraAmmo = sniperAmmo.extraAmmo + sniperAmmo.baseAmmo;
             MainCharScript.currHealth = MainCharScript.maxHealth;
+            MainChar.healthSystem();
             MainCharScript.missionSix = 0;
         }
         else if (MainCharScript.missionSix == 0 && MainChar.checkNearAsuna == true && Input.GetKeyDown(KeyCode.F))

@@ -4,11 +4,12 @@ using UnityEngine;
 
 public class MainCharScript : MonoBehaviour
 {
+    public static bool loseGame, winGame;
     public static int missionOne, missionTwo, missionThree, missionFour, missionFive, missionSix;
     public static int missionThreeScore, missionFourScore, missionFiveScore;
     public static int maxHealth = 100;
     public static int currHealth;
-    public HealthBarScript healthBar;
+    [SerializeField] public HealthBarScript healthBar;
     public bool pistolAvail, sniperAvail, pistolOn, sniperOn, checkNearAsuna;
     CharacterController cont;
     [SerializeField] private Camera cam;
@@ -31,9 +32,13 @@ public class MainCharScript : MonoBehaviour
     AudioSource src;
     [SerializeField] int speedUp;
     int display;
+
+    float checkTimer;
     // Start is called before the first frame update
     void Start()
     {
+        checkTimer = 60;
+        loseGame = winGame = false;
         src = GetComponent<AudioSource>();
         trainingWalls.SetActive(true); villageWalls.SetActive(true);
         pistolAvail = sniperAvail = pistolOn = sniperOn = checkNearAsuna = false;
@@ -82,8 +87,31 @@ public class MainCharScript : MonoBehaviour
         else checkNearAsuna = false;
         if (missionFour == 1) trainingWalls.SetActive(false);
         if (missionFive == 1) villageWalls.SetActive(false);
+
+        if (Input.GetKey(KeyCode.Z) && currHealth>0)
+        {
+            healthSystem();
+            //Debug.Log("CurrHealth Z : " + currHealth);
+        }
+
+        if (checkTimer > 0)
+        {
+            checkTimer -= Time.deltaTime;
+            //Debug.Log("timer = " + checkTimer + " in int = " + Mathf.FloorToInt(checkTimer));
+        }
+        //else Debug.Log("timer is 0");
     }
 
+    public void healthSystem()
+    {
+        if (currHealth > 0)
+        {
+            currHealth = currHealth - 1;
+            healthBar.SetHealth(currHealth);
+        }
+        else loseGame = true;
+    }
+    
     void MovetoDirection ()
     {
         Vector3 prevLoc = transform.eulerAngles;

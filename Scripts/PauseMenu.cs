@@ -7,25 +7,34 @@ public class PauseMenu : MonoBehaviour
 {
     public static bool GamePaused = false;
     public GameObject pauseUI;
+    AudioSource[] allAudio;
+    public static bool StopAudio = false;
     // Start is called before the first frame update
     void Start()
     {
-        
+ 
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (MainCharScript.currHealth <= 0 || MainCharScript.winGame == true)
+        {
+            Time.timeScale = 0;
+            GamePaused = true;
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+            if (StopAudio == false)
+            {
+                allAudio = FindObjectsOfType(typeof(AudioSource)) as AudioSource[];
+                foreach (AudioSource audios in allAudio) audios.Stop();
+                StopAudio = true;
+            }
+        }
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (GamePaused==true)
-            {
-                ResumeGame();
-            } 
-            else
-            {
-                PauseGame();
-            }
+            if (GamePaused == true && MainCharScript.currHealth > 0) ResumeGame();
+            else PauseGame();
         }
     }
 

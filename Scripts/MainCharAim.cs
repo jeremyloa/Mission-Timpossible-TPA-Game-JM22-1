@@ -9,7 +9,7 @@ public class MainCharAim : MonoBehaviour
     [SerializeField] Transform followPos;
     [SerializeField] public Transform aimPos;
     [SerializeField] float aimSmoothSpeed = 20;
-    [SerializeField] LayerMask aimMask;
+    [SerializeField] public LayerMask aimMask;
     Ray ray;
     public RaycastHit hit;
     public bool aimZoom;
@@ -38,12 +38,18 @@ public class MainCharAim : MonoBehaviour
         xAxis.Update(Time.deltaTime);
         yAxis.Update(Time.deltaTime);
 
+        if (Bullet.cl!=null) Debug.Log("Player Bullet Hit = " + Bullet.cl.gameObject.name);
         Vector2 screenCentre = new Vector2(Screen.width / 2, Screen.height / 2);
         ray = Camera.main.ScreenPointToRay(screenCentre);
         if (Physics.Raycast(ray, out hit, Mathf.Infinity, aimMask))
         {
-            Debug.Log(hit.transform.name);
+            Debug.Log("Player Raycast Hit = " + hit.transform.name);
             aimPos.position = Vector3.Lerp(aimPos.position, hit.point, aimSmoothSpeed * Time.deltaTime);
+            //Transform soldierTrans = Bullet.cl.gameObject.transform;
+            //SoldierEnemy soldierScript = Bullet.cl.gameObject.GetComponent<SoldierEnemy>();
+            //if (soldierTrans.position.y >= -15 && soldierScript.currHealth <= 0)
+            //    soldierTrans.position.Set(soldierTrans.position.x, soldierTrans.position.y - 1, soldierTrans.position.z);
+            //Debug.Log("enemy go down" + " name = " + Bullet.cl.gameObject.name);
         }
     }
 

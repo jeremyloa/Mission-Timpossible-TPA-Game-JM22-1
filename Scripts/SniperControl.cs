@@ -54,13 +54,13 @@ public class SniperControl : WeaponControl
         return false;
     }
 
-    public override void Shoot()
+    public void Shoot()
     {
         base.Shoot();
         //shootRateTimer = 0;
         //// Debug.Log("Shoot");
         //bulletPos.LookAt(aim.aimPos);
-        
+
         //for (int i = 0; i < bulletsPerShot; i++)
         //{
         //    GameObject currBullet = Instantiate(bullet, bulletPos.position, bulletPos.rotation);
@@ -71,6 +71,30 @@ public class SniperControl : WeaponControl
         //recoil = true;
 
         //NEW
+        if (aim.hit.transform.name.StartsWith("SoldierEnemy") && Bullet.cl.gameObject.name.StartsWith("SoldierEnemy"))
+        {
+            Debug.Log("shoot ketemu enemy from rifle");
+            if (aim.hit.transform.name.EndsWith("BOSS") && Bullet.cl.gameObject.name.EndsWith("BOSS"))
+            {
+                BossEnemy bossScript = Bullet.cl.gameObject.GetComponent<BossEnemy>();
+                Debug.Log("boss enemy health = " + bossScript.currHealth + " name = " + Bullet.cl.gameObject.name);
+                if (bossScript.currHealth > 0)
+                {
+                    bossScript.currHealth = bossScript.currHealth - 35;
+                    bossScript.healthBar.SetHealth(bossScript.currHealth/20);
+                    Debug.Log("boss enemy new health = " + bossScript.currHealth + " name = " + Bullet.cl.gameObject.name);
+                }
+                return;
+            }
+            SoldierEnemy soldierScript = Bullet.cl.gameObject.GetComponent<SoldierEnemy>();
+            Debug.Log("enemy health = " + soldierScript.currHealth + " name = " + Bullet.cl.gameObject.name);
+            if (soldierScript.currHealth > 0)
+            {
+                soldierScript.currHealth = soldierScript.currHealth - 35;
+                soldierScript.healthBar.SetHealth(soldierScript.currHealth);
+                Debug.Log("enemy new health = " + soldierScript.currHealth + " name = " + Bullet.cl.gameObject.name);
+            }
+        }
         ammo.currentAmmo--;
         MainCharScript.missionFourScore = MainCharScript.missionFourScore + 1;
     }

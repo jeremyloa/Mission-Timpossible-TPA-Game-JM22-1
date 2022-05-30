@@ -39,6 +39,7 @@ public class WeaponControl : MonoBehaviour
 
     public virtual void Shoot()
     {
+        if (MainCharScript.loseGame == true || MainCharScript.winGame == true || PauseMenu.GamePaused == true) return;
         bulletPos.LookAt(aim.aimPos);
         for (int i = 0; i < bulletsPerShot; i++)
         {

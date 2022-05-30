@@ -64,21 +64,45 @@ public class PistolControl : WeaponControl
     public void Shoot()
     {
         base.Shoot();
-       // shootRateTimer = 0;
-       //// Debug.Log("Shoot");
-       // bulletPos.LookAt(aim.aimPos);
-       // for (int i=0; i<bulletsPerShot; i++)
-       // {
-       //     GameObject currBullet = Instantiate(bullet, bulletPos.position, bulletPos.rotation);
-       //     Rigidbody rigid = currBullet.GetComponent<Rigidbody>();
-       //     rigid.AddForce(bulletPos.forward * bulletVelo, ForceMode.Impulse);
+        // shootRateTimer = 0;
+        //// Debug.Log("Shoot");
+        // bulletPos.LookAt(aim.aimPos);
+        // for (int i=0; i<bulletsPerShot; i++)
+        // {
+        //     GameObject currBullet = Instantiate(bullet, bulletPos.position, bulletPos.rotation);
+        //     Rigidbody rigid = currBullet.GetComponent<Rigidbody>();
+        //     rigid.AddForce(bulletPos.forward * bulletVelo, ForceMode.Impulse);
 
-       // }
-       // src.PlayOneShot(shotSFX);
-       // recoil = true;
+        // }
+        // src.PlayOneShot(shotSFX);
+        // recoil = true;
         //Debug.Log("Shoot Success");
 
         //NEW
+        if (aim.hit.transform.name.StartsWith("SoldierEnemy") && Bullet.cl.gameObject.name.StartsWith("SoldierEnemy"))
+        {
+            Debug.Log("shoot ketemu enemy from pistol");
+            if (aim.hit.transform.name.EndsWith("BOSS") && Bullet.cl.gameObject.name.EndsWith("BOSS"))
+            {
+                BossEnemy bossScript = Bullet.cl.gameObject.GetComponent<BossEnemy>();
+                Debug.Log("boss enemy health = " + bossScript.currHealth + " name = " + Bullet.cl.gameObject.name);
+                if (bossScript.currHealth > 0)
+                {
+                    bossScript.currHealth = bossScript.currHealth - 70;
+                    bossScript.healthBar.SetHealth(bossScript.currHealth / 20);
+                    Debug.Log("boss enemy new health = " + bossScript.currHealth + " name = " + Bullet.cl.gameObject.name);
+                }
+                return;
+            }
+            SoldierEnemy soldierScript = Bullet.cl.gameObject.GetComponent<SoldierEnemy>();
+            Debug.Log("enemy health = " + soldierScript.currHealth + " name = " + Bullet.cl.gameObject.name);
+            if (soldierScript.currHealth > 0)
+            {
+                soldierScript.currHealth = soldierScript.currHealth - 70;
+                soldierScript.healthBar.SetHealth(soldierScript.currHealth);
+                Debug.Log("enemy new health = " + soldierScript.currHealth + " name = " + Bullet.cl.gameObject.name);
+            }
+        }
         ammo.currentAmmo--;
         if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, STarget) 
             || aim.hit.transform.name.Equals("STarget"))
@@ -86,5 +110,6 @@ public class PistolControl : WeaponControl
             MainCharScript.missionThreeScore = MainCharScript.missionThreeScore + 1;
             Debug.Log("Shoot Target Success " + MainCharScript.missionThreeScore);
         }
+
     }
 }
